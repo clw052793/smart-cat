@@ -5,7 +5,7 @@ import {
 import { useState, useRef, useEffect } from "react";
 
 // ===== 配置區 =====
-const SERVER_URL = "https://smart-cat-production-8d1a.up.railway.app"; // 你的 Railway URL
+const SERVER_URL = "https://smart-cat-production-8d1a.up.railway.app/chat"; // 你的 Railway URL
 // ==================
 
 export default function ChatPage() {
@@ -46,12 +46,8 @@ export default function ChatPage() {
     }
   };
 
-  // 自動滾動到底部
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      scrollRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-    return () => clearTimeout(timeout);
+    scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
   return (
@@ -87,7 +83,7 @@ export default function ChatPage() {
           placeholder="跟斑斑說話..."
           style={styles.input}
           editable={!loading}
-          onSubmitEditing={sendMessage} // 按 Enter 送出
+          onSubmitEditing={sendMessage} 
           returnKeyType="send"
         />
         <TouchableOpacity
