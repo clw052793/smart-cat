@@ -5,7 +5,7 @@ import {
 import { useState, useRef, useEffect } from "react";
 
 // ===== 配置區 =====
-const SERVER_URL = "https://smart-cat-production-8d1a.up.railway.app/chat"; // 你的 Railway URL
+const SERVER_URL = "https://smart-cat-production-8d1a.up.railway.app"; // 你的 Railway URL
 // ==================
 
 export default function ChatPage() {
