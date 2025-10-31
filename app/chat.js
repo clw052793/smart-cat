@@ -3,22 +3,16 @@ import {
   KeyboardAvoidingView, Platform, StyleSheet, Alert 
 } from "react-native";
 import { useState, useRef, useEffect } from "react";
-import Constants from "expo-constants";
+
+// ===== 配置區 =====
+const SERVER_URL = "https://smart-cat-production-8d1a.up.railway.app/chat"; // 你的 Railway URL
+// ==================
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef();
-
-  // ===== 配置區 =====
-  const USE_REMOTE_SERVER = false; // true: 使用雲端伺服器，false: 本地測試
-  const REMOTE_SERVER_URL = "https://your-remote-server.com/chat"; // 替換成你的雲端 URL
-  // ==================
-
-  // 自動抓 Expo CLI 本地 IP
-  const LOCAL_IP = Constants.manifest?.debuggerHost?.split(":")[0] || "localhost";
-  const SERVER_URL = USE_REMOTE_SERVER ? REMOTE_SERVER_URL : `http://${LOCAL_IP}:3000/chat`;
 
   const sendMessage = async () => {
     if (!input) return;
@@ -46,14 +40,18 @@ export default function ChatPage() {
     } catch (e) {
       console.error(e);
       setMessages([...newMessages, { sender: "cat", text: "斑斑暫時不想說話 😿" }]);
-      Alert.alert("錯誤", "無法連接到伺服器，請確認手機與電腦在同一個網路");
+      Alert.alert("錯誤", "無法連接到伺服器，請確認網路連線正常");
     } finally {
       setLoading(false);
     }
   };
 
+  // 自動滾動到底部
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
+    const timeout = setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+    return () => clearTimeout(timeout);
   }, [messages]);
 
   return (
@@ -76,7 +74,7 @@ export default function ChatPage() {
             ]}
           >
             <Text style={m.sender === "user" ? styles.userText : styles.catText}>
-              {m.text}
+              {m.sender === "user" ? "你" : "斑斑"}: {m.text}
             </Text>
           </View>
         ))}
@@ -89,6 +87,8 @@ export default function ChatPage() {
           placeholder="跟斑斑說話..."
           style={styles.input}
           editable={!loading}
+          onSubmitEditing={sendMessage} // 按 Enter 送出
+          returnKeyType="send"
         />
         <TouchableOpacity
           onPress={sendMessage}
@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, paddingHorizontal: 10 },
   messageBubble: { maxWidth: "70%", padding: 10, borderRadius: 12, marginBottom: 8 },
   userBubble: { backgroundColor: "#DCF8C6", alignSelf: "flex-end", borderBottomRightRadius: 0 },
-  catBubble: { backgroundColor: "#FCD34D", alignSelf: "flex-start", borderBottomLeftRadius: 0 },
+  catBubble: { backgroundColor: "#FDE68A", alignSelf: "flex-start", borderBottomLeftRadius: 0 },
   userText: { color: "#111" },
-  catText: { color: "#111" },
+  catText: { color: "#111", fontWeight: "bold" },
   inputContainer: { flexDirection: "row", alignItems: "center", padding: 8, borderTopWidth: 1, borderTopColor: "#EEE", backgroundColor: "#FFF7ED" },
   input: { flex: 1, borderWidth: 1, borderColor: "#CCC", borderRadius: 20, paddingHorizontal: 15, paddingVertical: Platform.OS === "ios" ? 12 : 8, marginRight: 5, backgroundColor: "#FFF" },
   sendButton: { backgroundColor: "#F59E0B", paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20, justifyContent: "center", alignItems: "center" },
